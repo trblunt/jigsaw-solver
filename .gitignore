@@ -1,0 +1,8 @@
+# .gitignore
+# Generated files
+./generated_pieces
+# Compiled files
+./solver
+./generate_pieces
+# Images
+*.jpg

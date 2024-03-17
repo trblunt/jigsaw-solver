@@ -1,66 +1,60 @@
 #include "MST_solver.h"
 
-void MST::fill_greedy(vector<Block> &ans,bool *used)
-{
-	int CC[X];
-	int a,bb,a1,b1;
-	minDis top;
-	int ind;
-	double matemp,ma;
+void MST::fill_greedy(vector<Block>& ans, bool* used) {
+    int CC[X];
+    for (int i = 0; i < X; i++) CC[i] = 0;
 
-	for(int i=0;i<X;i++)
-		CC[i] = 0;
+    // Directions: right, down, left, up
+    int dx[4] = {0, 1, 0, -1};
+    int dy[4] = {1, 0, -1, 0};
 
-	for(int i=0;i<X;i++)
-	{
-		a=i/N,bb=i%N;
+    for (int i = 0; i < X; i++) {
+        int a = i / N, bb = i % N;
 
-		for(int j=0;j<4;j++)
-		{
-			a1=a+xx[j],b1=bb+yy[j];
-			if(a1<0||a1>=N) continue;
-			if(b1<0||b1>=N) continue;
-			if(ans[a1*N+b1].idx!=-1)
-				CC[i]++;
-		}
-	}
-	priority_queue<minDis> Q;
-	for(int i=0;i<X;i++)
-	  if(!used[ans[i].idx])
-		Q.push(minDis(CC[i],i));
+        for (int j = 0; j < 4; j++) {
+            int a1 = a + dx[j], b1 = bb + dy[j];
+            if (a1 < 0 || a1 >= N || b1 < 0 || b1 >= N) continue;
+            if (ans[a1 * N + b1].idx != -1) CC[i]++;
+        }
+    }
 
-	while(Q.size())
-	{
-		top = Q.top();
-		Q.pop();
-		if(ans[top.id].idx!=-1) 
-			continue;
-		ind=-1;
-		ma = 0;
-		for(int i=0;i<X;i++)
-		if(!used[i])
-		{
-			matemp=pieces->getWeight(ans,top.id,pieces->block[i]);
-			if(ind==-1||ma>matemp) ind=i,ma=matemp;
-		}
+    priority_queue<minDis> Q;
+    for (int i = 0; i < X; i++)
+        if (!used[ans[i].idx])
+            Q.push(minDis(CC[i], i));
 
-		a=top.id/N,bb=top.id%N;
-		for(int j=0;j<4;j++)
-		{
-			a1=a+xx[j],b1=bb+yy[j];
-			if(a1<0||a1>=N) continue;
-			if(b1<0||b1>=N) continue;
-			if(ans[a1*N+b1].idx==-1)
-			{
-				CC[a1*N+b1]++;
-				Q.push(minDis(CC[a1*N+b1],a1*N+b1)); 
-			}
-		}
+    while (!Q.empty()) {
+        minDis top = Q.top();
+        Q.pop();
+        if (ans[top.id].idx != -1) continue;
 
-		ans[top.id] = pieces->block[ind]; 
-		used[ind] =1;
-	}
+        int ind = -1;
+        double ma = 0.0;
+        for (int i = 0; i < X; i++) {
+            if (!used[i]) {
+                double matemp = pieces->getWeight(ans, top.id, pieces->block[i]);
+                if (ind == -1 || ma > matemp) {
+                    ind = i;
+                    ma = matemp;
+                }
+            }
+        }
+
+        ans[top.id] = pieces->block[ind];
+        used[ind] = 1;
+
+        int a = top.id / N, bb = top.id % N;
+        for (int j = 0; j < 4; j++) {
+            int a1 = a + dx[j], b1 = bb + dy[j];
+            if (a1 < 0 || a1 >= N || b1 < 0 || b1 >= N) continue;
+            if (ans[a1 * N + b1].idx == -1) {
+                CC[a1 * N + b1]++;
+                Q.push(minDis(CC[a1 * N + b1], a1 * N + b1));
+            }
+        }
+    }
 }
+
 
 vector<Block> MST::get_mst(int height,int width)
 {

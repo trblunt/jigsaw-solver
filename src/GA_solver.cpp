@@ -1,33 +1,39 @@
 #include "GA_solver.h"
 
-int GA::findbuddy(vector<Block> &c, bool * used, int k)
-{
-  int a=k/N,bb=k%N;
-  for(int i=0;i<4;i++)
-  {
-    int a1=a+xx[i],b1=bb+yy[i];
-    if(a1<0||a1>=N) continue;
-    if(b1<0||b1>=N) continue;
+int GA::findbuddy(vector<Block> &c, bool * used, int k) {
+    int a = k / N, bb = k % N;
 
-    if(c[a1*N+b1].idx==-1) continue;
-    if(i==0) {
-      int l = bbl[c[a1*N+b1].idx];
-      if(!used[l]) return l;
+    // Directions: right, down, left, up
+    int dx[4] = {0, 1, 0, -1};
+    int dy[4] = {1, 0, -1, 0};
+
+    for (int i = 0; i < 4; i++) {
+        int a1 = a + dx[i], b1 = bb + dy[i];
+        if (a1 < 0 || a1 >= N || b1 < 0 || b1 >= N) continue;
+
+        if (c[a1 * N + b1].idx == -1) continue;
+
+        int l = -1;
+        // Select the correct buddy list based on the direction
+        switch(i) {
+            case 0: // Right
+                l = bbr[c[a1 * N + b1].idx];
+                break;
+            case 1: // Down
+                l = bbd[c[a1 * N + b1].idx];
+                break;
+            case 2: // Left
+                l = bbl[c[a1 * N + b1].idx];
+                break;
+            case 3: // Up
+                l = bbt[c[a1 * N + b1].idx];
+                break;
+        }
+
+        if (l != -1 && !used[l]) return l;
     }
-    if(i==1) {
-      int l = bbt[c[a1*N+b1].idx];
-      if(!used[l]) return l;
-    }
-    if(i==2) {
-      int l = bbr[c[a1*N+b1].idx];
-      if(!used[l]) return l;
-    }
-    if(i==3) {
-      int l = bbd[c[a1*N+b1].idx];
-      if(!used[l]) return l;
-    }
-  }
-  return -1;
+
+    return -1;
 }
 
 vector<Block> GA::crossover(vector<Block> &a, vector<Block> &b)
@@ -93,9 +99,15 @@ vector<Block> GA::crossover(vector<Block> &a, vector<Block> &b)
     int aa,bb;
     bb=temp%N;
     aa=temp/N;
+
+    // Directions: right, down, left, up
+    int dx[4] = {0, 1, 0, -1};
+    int dy[4] = {1, 0, -1, 0};
+
+
     for(int i=0;i<4;i++)
     {
-      int a1=aa+xx[i],b1=bb+yy[i];
+      int a1=aa+dx[i],b1=bb+dy[i];
       if(a1<0||a1>=N) continue;
       if(b1<0||b1>=N) continue;
       if(vis[a1*N+b1]) continue;

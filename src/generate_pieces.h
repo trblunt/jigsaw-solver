@@ -15,6 +15,8 @@
 #include <fstream>
 #include <cmath>
 
+#include <opencv2/core.hpp>
+
 #include "image.hpp"
 
 using namespace std;
@@ -22,7 +24,7 @@ using namespace std;
 #define bin 10
 
 Block* block;
-void generateImages(IplImage* img, int n, int height, int width);
+void generateImages(cv::Mat img, int n, int height, int width);
 void assignMemory(int height,int width,int X);
 vector<Block> permute(int n);
 #endif

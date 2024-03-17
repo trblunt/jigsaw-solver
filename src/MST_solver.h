@@ -10,6 +10,7 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <set>
 #include <time.h>
 #include <sstream>
 #include <fstream>
@@ -27,7 +28,6 @@ using namespace std;
 #define L 3
 #define INF 1000000000
 #define TIME_LIMIT 15.0
-
 
 struct minDis
 {
