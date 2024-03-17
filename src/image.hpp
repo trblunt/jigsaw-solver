@@ -103,7 +103,7 @@ public:
         return v;
     }
 
-    void initializeAll() {
+    void initializeAll(int givenN) {
         std::string firstImageFilename = "generated_pieces/1.jpg";
         cv::Mat firstImg = cv::imread(firstImageFilename, cv::IMREAD_COLOR);
         if (firstImg.empty()) {
@@ -111,8 +111,12 @@ public:
             return;
         }
 
-        cout << "Enter The Value of N in NxN : \n";
-        cin >> N;
+        if (givenN > 0) {
+            N = givenN;
+        } else {
+            cout << "Enter The Value of N in NxN : \n";
+            cin >> N;
+        }
         height = firstImg.rows;
         width = firstImg.cols;
         X = N * N;

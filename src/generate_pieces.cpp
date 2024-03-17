@@ -58,7 +58,7 @@ vector<Block> permute(int n) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
+    if (argc != 2 && argc != 3) {
         std::cerr << "No file name found. Please pass a file name as a parameter." << std::endl;
         exit(1);
     }
@@ -71,8 +71,13 @@ int main(int argc, char* argv[]) {
 
     int height, width, n, len;
     std::cout << "Image dimensions: " << img.rows << " " << img.cols << std::endl;
-    std::cout << "Enter side length of square piece: ";
-    std::cin >> len;
+    if (argc == 3) {
+        len = std::stoi(argv[2]);
+        std::cout << "Side length of square piece: " << len << std::endl;
+    } else {
+        std::cout << "Enter side length of square piece: ";
+        std::cin >> len;
+    }
 
     if (len < 1) {
         std::cerr << "Invalid side length." << std::endl;

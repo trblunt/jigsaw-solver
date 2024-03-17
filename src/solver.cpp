@@ -68,7 +68,15 @@ double calculateNCS(const vector<Block>& solved, int N) {
 
 
 int main(int argc, char* argv[]) {
-    pieces.initializeAll();
+    int given_N = -1;
+    if (argc == 2) {
+        given_N = atoi(argv[1]);
+    } else if (argc != 1) {
+        cout << "Usage: " << argv[0] << " [N]" << endl;
+        return 1;
+    }
+
+    pieces.initializeAll(given_N);
     N = pieces.N;
     X = N * N;
 

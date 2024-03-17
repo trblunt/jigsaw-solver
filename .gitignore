@@ -1,8 +1,9 @@
 # .gitignore
 # Generated files
-./generated_pieces
+generated_pieces
 # Compiled files
-./solver
-./generate_pieces
+solver
+generate_pieces
 # Images
 *.jpg
+*.csv
