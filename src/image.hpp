@@ -54,9 +54,9 @@ public:
 
     Images() : block(nullptr), N(0), X(0), height(0), width(0) {}
 
-    void loadImages() {
+    void loadImages(string dir) {
         std::unordered_map<int, int> originalIndices; // Map scrambled index to original index
-        std::ifstream metadataFile("generated_pieces/original_positions.txt");
+        std::ifstream metadataFile(dir + "original_positions.txt");
         std::string line;
         while (std::getline(metadataFile, line)) {
             std::istringstream iss(line);
@@ -69,7 +69,7 @@ public:
         metadataFile.close();
 
         for (int i = 0; i < X; i++) {
-            std::string filename = "generated_pieces/" + std::to_string(i + 1) + ".jpg";
+            std::string filename = dir + std::to_string(i + 1) + ".jpg";
             cv::Mat img = cv::imread(filename);
             if (img.empty()) {
                 std::cerr << "Error loading: " << filename << std::endl;
@@ -103,8 +103,8 @@ public:
         return v;
     }
 
-    void initializeAll(int givenN) {
-        std::string firstImageFilename = "generated_pieces/1.jpg";
+    void initializeAll(int givenN, string dir) {
+        std::string firstImageFilename = dir + "1.jpg";
         cv::Mat firstImg = cv::imread(firstImageFilename, cv::IMREAD_COLOR);
         if (firstImg.empty()) {
             cerr << "Failed to load image: " << firstImageFilename << endl;
@@ -122,7 +122,7 @@ public:
         X = N * N;
         initializeVector(X);
         assignMemory();
-        loadImages();
+        loadImages(dir);
         insertInTopMatrix();
         insertInLeftMatrix();
     }

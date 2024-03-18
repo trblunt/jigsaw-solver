@@ -1,5 +1,6 @@
 #include "generate_pieces.h"
 #include <opencv2/imgcodecs.hpp> // Include for cv::imread and cv::imwrite
+#include <random>
 
 void assignMemory(int height, int width, int X) {
     block = new Block[X];
@@ -44,21 +45,25 @@ void generateImages(cv::Mat img, int n, int height, int width) {
     }
 }
 
-vector<Block> permute(int n) {
+vector<Block> permute(int n, int seed) {
+    std::random_device rd;
+    std::default_random_engine generator(seed);
+    std::uniform_int_distribution<int> distribution(0, n - 1);
+
     vector<Block> temp;
     for (int j = 0; j < n; j++) {
         block[j].idx = j;
         temp.pb(block[j]);
     }
     for (int j = 0; j < n; j++) {
-        int rnd = rand() % n;
+        int rnd = distribution(generator);
         swap(temp[j], temp[rnd]);
     }
     return temp;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2 && argc != 3) {
+    if (argc != 2 && argc != 5) {
         std::cerr << "No file name found. Please pass a file name as a parameter." << std::endl;
         exit(1);
     }
@@ -70,9 +75,17 @@ int main(int argc, char* argv[]) {
     }
 
     int height, width, n, len;
+    string dir = "./generated_pieces";
+    int seed = time(0);
     std::cout << "Image dimensions: " << img.rows << " " << img.cols << std::endl;
-    if (argc == 3) {
+    if (argc == 5) {
         len = std::stoi(argv[2]);
+        dir = argv[3];
+        seed = std::stoi(argv[4]);
+        // If dir doesn't end with a '/', add it
+        if (dir.back() != '/') {
+            dir += '/';
+        }
         std::cout << "Side length of square piece: " << len << std::endl;
     } else {
         std::cout << "Enter side length of square piece: ";
@@ -90,15 +103,13 @@ int main(int argc, char* argv[]) {
     assignMemory(height, width, n * n);
     generateImages(img, n, height, width);
 
-    vector<Block> permuted = permute(n * n);
-    std::ofstream metadataFile("./generated_pieces/original_positions.txt");
+    vector<Block> permuted = permute(n * n, seed);
+    std::ofstream metadataFile(dir + "original_positions.txt");
 
     for (int i = 0; i < n * n; i++) {
-        char filename[50] = "./generated_pieces/";
-        char fileid[10];
-        sprintf(fileid, "%d.jpg", i + 1);
-        cv::Mat pieceImg = cv::Mat::zeros(height, width, CV_8UC3);
 
+        cv::Mat pieceImg = cv::Mat::zeros(height, width, CV_8UC3);
+        string fileid = std::to_string(i + 1) + ".jpg";
         for (int j = 0; j < height; j++) {
             for (int k = 0; k < width; k++) {
                 // Access the pixel values from permuted[i].image[j][k]
@@ -108,10 +119,10 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        std::string fullPath = std::string(filename) + std::string(fileid);
+        std::string fullPath = dir + fileid;
         cv::imwrite(fullPath, pieceImg);
         metadataFile << i + 1 << "," << permuted[i].original_idx << std::endl;
-        printf("Generated %s\n", fileid);
+        printf("Generated %s\n", fileid.c_str());
     }
 
     metadataFile.close();

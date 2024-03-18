@@ -1,6 +1,7 @@
 # .gitignore
 # Generated files
 generated_pieces
+generated
 # Compiled files
 solver
 generate_pieces

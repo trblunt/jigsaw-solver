@@ -69,19 +69,25 @@ double calculateNCS(const vector<Block>& solved, int N) {
 
 int main(int argc, char* argv[]) {
     int given_N = -1;
-    if (argc == 2) {
+    string dir = "./generated_pieces";
+    if (argc == 3) {
         given_N = atoi(argv[1]);
+        dir = argv[2];
+        // If dir doesn't end with a slash, add one
+        if (dir.back() != '/') {
+            dir += '/';
+        }
     } else if (argc != 1) {
         cout << "Usage: " << argv[0] << " [N]" << endl;
         return 1;
     }
 
-    pieces.initializeAll(given_N);
+    pieces.initializeAll(given_N, dir);
     N = pieces.N;
     X = N * N;
 
     vector<Block> scrambled = pieces.getScrambledImage();
-    saveResult(scrambled, pieces.height, pieces.width, "scrambled_image.jpg");
+    saveResult(scrambled, pieces.height, pieces.width, dir + "scrambled_image.jpg");
 
     vector<Block> ans;
     // if (N > 15) {
@@ -91,7 +97,7 @@ int main(int argc, char* argv[]) {
         GA ga(N, &pieces);
         ans = ga.runAlgo(pieces.height, pieces.width);
     // }
-    saveResult(ans, pieces.height, pieces.width, "solved_image.jpg");
+    saveResult(ans, pieces.height, pieces.width, dir + "solved_image.jpg");
 
     cout << "NCS: " << calculateNCS(ans, N) << endl;
 
