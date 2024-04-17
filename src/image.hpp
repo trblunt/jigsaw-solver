@@ -42,6 +42,7 @@ struct Block {
     int* bins;
     int idx;
     int original_idx;
+    int rotation;
 };
 
 class Images {
