@@ -1,5 +1,6 @@
 #include "generate_pieces.h"
 #include <opencv2/imgcodecs.hpp> // Include for cv::imread and cv::imwrite
+#include <opencv2/core.hpp> // Include for cv::rotate
 #include <random>
 
 void assignMemory(int height, int width, int X) {
@@ -62,6 +63,47 @@ vector<Block> permute(int n, int seed) {
     return temp;
 }
 
+void rotatePieces(vector<Block>& blocks, int height, int width) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 3); // Random number for rotation index (0, 1, 2, 3)
+
+    for (Block& block : blocks) {
+        int rotation_index = dis(gen);
+        block.rotation = rotation_index; // Convert index to degrees
+
+        cv::Mat src(height, width, CV_8UC3), rotated;
+        // Convert block's Pixel** image to cv::Mat src
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                src.at<cv::Vec3b>(i, j) = cv::Vec3b(block.image[i][j].val[0], block.image[i][j].val[1], block.image[i][j].val[2]);
+            }
+        }
+
+        // Rotate image
+        if (rotation_index == 1) { // 90 degrees
+            cv::rotate(src, rotated, cv::ROTATE_90_CLOCKWISE);
+        } else if (rotation_index == 2) { // 180 degrees
+            cv::rotate(src, rotated, cv::ROTATE_180);
+        } else if (rotation_index == 3) { // 270 degrees
+            cv::rotate(src, rotated, cv::ROTATE_90_COUNTERCLOCKWISE);
+        } else {
+            rotated = src.clone(); // 0 degrees, no rotation
+        }
+
+        // Convert rotated cv::Mat back to Pixel**
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                cv::Vec3b pix = rotated.at<cv::Vec3b>(i, j);
+                for (int h = 0; h < 3; h++) {
+                    block.image[i][j].val[h] = pix[h];
+                }
+            }
+        }
+    }
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc != 2 && argc != 5) {
         std::cerr << "No file name found. Please pass a file name as a parameter." << std::endl;
@@ -104,6 +146,7 @@ int main(int argc, char* argv[]) {
     generateImages(img, n, height, width);
 
     vector<Block> permuted = permute(n * n, seed);
+    rotatePieces(permuted, height, width);
     std::ofstream metadataFile(dir + "original_positions.txt");
 
     for (int i = 0; i < n * n; i++) {
@@ -121,7 +164,7 @@ int main(int argc, char* argv[]) {
 
         std::string fullPath = dir + fileid;
         cv::imwrite(fullPath, pieceImg);
-        metadataFile << i + 1 << "," << permuted[i].original_idx << std::endl;
+        metadataFile << i + 1 << "," << permuted[i].original_idx << "," << permuted[i].rotation << std::endl;
         printf("Generated %s\n", fileid.c_str());
     }
 
