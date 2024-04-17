@@ -37,6 +37,7 @@ double calculateNCS(const vector<Block>& solved, int N) {
     int totalRelations = 0;
 
     for (int i = 0; i < solved.size(); ++i) {
+        /*
         int originalX = solved[i].original_idx % N;
         int originalY = solved[i].original_idx / N;
 
@@ -59,6 +60,11 @@ double calculateNCS(const vector<Block>& solved, int N) {
             }
             totalRelations++;
         }
+        */
+        if (i == solved[i].original_idx) {
+            correctRelations++;
+        }
+        totalRelations++;
     }
 
     double ncs = totalRelations > 0 ? static_cast<double>(correctRelations) / totalRelations : 0;
